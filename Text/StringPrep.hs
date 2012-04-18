@@ -42,6 +42,7 @@ runStringPrep (Profile maps norm prohibs bidi) s = result
 				then Nothing
 				else Just t
 
+checkBidi :: Text -> Bool
 checkBidi t = not containsRandL || not containsAL && firstRandL && lastRandL
 	where
 		containsRandL = Text.any (\x -> Set.member (single x) randl) t
@@ -65,12 +66,16 @@ b2 c = case Map.lookup c b2map of
 	Nothing -> Text.singleton c
 	Just t -> t
 
+c11 :: [Range Char]
 c11 = [single ' ']
 
+c12 :: [Range Char]
 c12 = map single ['\x00A0','\x1680','\x2000','\x2001','\x2002','\x2003','\x2004','\x2005','\x2006','\x2007','\x2008','\x2009','\x200A','\x200B','\x202F','\x205F','\x3000']
 
+c21 :: [Range Char]
 c21 = [range '\x0' '\x1f', single '\x7f']
 
+c22 :: [Range Char]
 c22 = [
 	range '\x80' '\x9f',
 	single '\x6dd', single '\x070F', single '\x180E',
@@ -82,11 +87,13 @@ c22 = [
 	range '\xfff9' '\xfffc',
 	range '\x1d173' '\x1d17a']
 
+c3 :: [Range Char]
 c3 = [
 	range '\xe000' '\xf8ff',
 	range '\xf0000' '\xffffd',
 	range '\x100000' '\x10fffd']
 
+c4 :: [Range Char]
 c4 = [
 	range '\xFDD0' '\xFDEF',
 	range '\xFFFE' '\xFFFF',
@@ -108,18 +115,24 @@ c4 = [
 	range '\x10FFFE' '\x10FFFF']
 
 
+c5 :: [Range Char]
 c5 = [range '\xd800' '\xdfff']
 
+c6 :: [Range Char]
 c6 = [range '\xfff9' '\xfffd']
 
+c7 :: [Range Char]
 c7 = [range '\x2ff0' '\x2ffb']
 
+c8 :: [Range Char]
 c8 = [
 	single '\x340', single '\x341', single '\x200e', single '\x200f',
 	range '\x202a' '\x202e', range '\x206a' '\x206f']
 
+c9 :: [Range Char]
 c9 = [single '\xe0001', range '\xe0020' '\xe007f']
 
+randl :: Set.Set (Range Char)
 randl = toSet $ ranges [
 	single '\x05BE',
 	single '\x05C0',
@@ -156,6 +169,7 @@ randl = toSet $ ranges [
 	range '\xFE70' '\xFE74',
 	range '\xFE76' '\xFEFC']
 
+l :: Set.Set (Range Char)
 l = toSet $ ranges [range '\x0041' '\x005A',
 	range '\x0061' '\x007A',
 	single '\x00AA',
@@ -1891,6 +1905,7 @@ b2map = Map.fromAscList . map (\(x,y) -> (x, Text.pack y)) $ [
 	('\x1D7A8', "\x03C9"),
 	('\x1D7BB', "\x03C3")]
 
+a1 :: [Range Char]
 a1 = [
 	single '\x0221',
 	range '\x0234' '\x024F',
