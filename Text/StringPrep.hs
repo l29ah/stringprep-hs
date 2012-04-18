@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Text.StringPrep (
 StringPrepProfile(..),
 runStringPrep,
@@ -16,7 +15,7 @@ import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Data.Ranges
 
-data StringPrepProfile = Profile 
+data StringPrepProfile = Profile
 	{
 		maps :: [Map],
 		shouldNormalize :: Bool,
@@ -25,7 +24,7 @@ data StringPrepProfile = Profile
 	}
 
 runStringPrep :: StringPrepProfile -> Text -> Maybe Text
-runStringPrep (Profile maps norm prohibs bidi) s = result 
+runStringPrep (Profile maps norm prohibs bidi) s = result
 	where
 		prohibited = toSet $ ranges $ concat prohibs
 		mapped = foldr Text.concatMap s maps
@@ -58,7 +57,7 @@ b1 c =
 	if c `Set.member` mapToNothings
 		then Text.empty
 		else Text.singleton c
-			
+
 mapToNothings = Set.fromAscList ['\x00AD', '\x034F', '\x1806', '\x180B', '\x180C','\x180D', '\x200B', '\x200C', '\x200D', '\x2060', '\xFE00', '\xFE01', '\xFE02','\xFE03', '\xFE04', '\xFE05', '\xFE06', '\xFE07', '\xFE08', '\xFE09', '\xFE0A', '\xFE0B', '\xFE0C', '\xFE0D', '\xFE0E', '\xFE0F', '\xFEFF']
 
 b2 :: Map
@@ -118,7 +117,7 @@ c7 = [range '\x2ff0' '\x2ffb']
 c8 = [
 	single '\x340', single '\x341', single '\x200e', single '\x200f',
 	range '\x202a' '\x202e', range '\x206a' '\x206f']
-	
+
 c9 = [single '\xe0001', range '\xe0020' '\xe007f']
 
 randl = toSet $ ranges [
@@ -519,7 +518,7 @@ l = toSet $ ranges [range '\x0041' '\x005A',
 	range '\x100000' '\x10FFFD']
 
 b2map :: Map.Map Char Text
-b2map = Map.fromAscList [
+b2map = Map.fromAscList . map (\(x,y) -> (x, Text.pack y)) $ [
 	('\x0041', "\x0061"),
 	('\x0042', "\x0062"),
 	('\x0043', "\x0063"),
