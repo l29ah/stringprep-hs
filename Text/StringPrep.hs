@@ -9,8 +9,6 @@ c11,c12,c21,c22,c3,c4,c5,c6,c7,c8,c9
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Text.ICU.Normalize (NormalizationMode(NFKC),normalize)
-import Data.List.Stream
-import Prelude hiding (any,concatMap,concat,foldr,map)
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Data.Ranges
