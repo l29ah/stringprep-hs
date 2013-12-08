@@ -14,10 +14,10 @@ extra-source-files: Text/*.hs
 Library
  Build-Depends: base          >=3 &&    < 5
               , containers    >=0.2
-              , ranges        >=0.2.2
               , text-icu      >=0.6
               , text          >=0.9
  Exposed-modules: Text.StringPrep
                 , Text.NamePrep
                 , Text.SaslPrep
- ghc-options: -O -Wall -fno-warn-name-shadowing
+ Other-modules:   Text.CharRanges
+ ghc-options: -O2 -Wall -fno-warn-name-shadowing
