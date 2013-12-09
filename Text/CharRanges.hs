@@ -10,11 +10,12 @@ data Range = Single {-# UNPACK #-} !Char
 
 -- | A rather hacked-up instance.
 --   This is to support fast lookups using 'Data.Set' (see 'toSet').
+--   x == y iff x and y overlap
 instance Eq Range where
 	(Single x) == (Single y) = x == y
 	(Single a) == (Range x y) = x <= a && a <= y
 	(Range x y) == (Single a) = x <= a && a <= y
-	(Range lx ux) == (Range ly uy) = (lx <= uy && ux >= ly) || (ly <= ux && uy >= lx)
+	(Range lx ux) == (Range ly uy) = (lx <= uy && ly <= ux)
 
 instance Ord Range where
 	(Single x) <= (Single y) = x <= y
