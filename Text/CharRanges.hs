@@ -29,17 +29,22 @@ toSet = Set.fromDistinctAscList . prepareRanges
   where prepareRanges :: [Range] -> [Range]
         prepareRanges =  go . sort
         go (r1:r2:rs) | Just r' <- maybeMergeRanges r1 r2 = go (r':rs)
-                      | otherwise = r1 : go (r2:rs)
+                      | rss@(r3:rs') <- go (r2:rs) =
+            case maybeMergeRanges r1 r3 of
+                Nothing -> r1:rss
+                Just r' -> r':rs'
         go rs = rs
-        maybeMergeRanges :: Range -> Range -> Maybe Range
-        maybeMergeRanges x y = if x == y
-                               then Just $ minMax x y
-                               else Nothing
+
+maybeMergeRanges :: Range -> Range -> Maybe Range
+maybeMergeRanges x y = if x == y -- overlap
+                       then Just $ minMax x y
+                       else Nothing
+{-# INLINE maybeMergeRanges #-}
 
 minMax :: Range -> Range -> Range
 minMax (Range lx ux) (Range ly uy) = Range (min lx ly) (max ux uy)
 minMax (Single _) y = y
-minMax x@(Range _ _) (Single _) = x
+minMax x (Single _) = x
 {-# INLINE minMax #-}
 
 range :: Char -> Char -> Range
