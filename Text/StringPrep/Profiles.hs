@@ -1,11 +1,15 @@
-module Text.SaslPrep
-  ( saslPrepQuery
+{-# LANGUAGE OverloadedStrings #-}
+
+-- | Profiles as defined by various sources
+module Text.StringPrep.Profiles
+  ( namePrepProfile
+  , saslPrepQuery
   , saslPrepStore
   ) where
 
+
 import qualified Data.Set as Set
-import           Data.Text (Text)
-import           Data.Text(singleton)
+import           Data.Text (Text, singleton)
 import           Text.StringPrep
 
 nonAsciiSpaces :: Set.Set Char
@@ -15,8 +19,18 @@ nonAsciiSpaces = Set.fromList [ '\x00A0', '\x1680', '\x2000', '\x2001', '\x2002'
                               , '\x205F', '\x3000'
                               ]
 
+
+namePrepProfile :: Bool -> StringPrepProfile
+namePrepProfile allowUnassigned =
+	Profile {
+		maps = [b1,b2],
+		shouldNormalize = True,
+		prohibited = (if allowUnassigned then [] else [a1]) ++ [c12,c22,c3,c4,c5,c6,c7,c8,c9],
+		shouldCheckBidi = True
+	}
+
 toSpace :: Char -> Text
-toSpace x = if x `Set.member` nonAsciiSpaces then singleton ' ' else singleton x
+toSpace x = if x `Set.member` nonAsciiSpaces then " " else singleton x
 
 saslPrepQuery :: StringPrepProfile
 saslPrepQuery = Profile
