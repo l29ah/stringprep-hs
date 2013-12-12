@@ -26,6 +26,11 @@ instance Eq CharRange where
     CR (Single a)    == CR (Range x y) = x <= a && a <= y
     CR (Range x y)   == CR (Single a) = x <= a && a <= y
     CR (Range lx ux) == CR (Range ly uy) = (lx <= uy && ly <= ux)
+                                        || (lx <= uy && ly <= ux) -- INTENTIONAL
+                                           -- For some strange reason GHC
+                                           -- (7.6.3) seems to have problems
+                                           -- optimizing this expressions
+                                           -- without the additional or
 
 instance Ord CharRange where
     CR (Single x)  <= CR (Single y) = x <= y
