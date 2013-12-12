@@ -1,5 +1,12 @@
 {-# LANGUAGE PatternGuards #-}
-module Text.CharRanges where
+module Text.CharRanges
+  ( Range(..)
+  , range
+  , single
+  , CharSet
+  , toSet
+  , member
+  ) where
 
 import           Data.List
 import           Data.Set (Set)
@@ -7,27 +14,33 @@ import qualified Data.Set as Set
 
 data Range = Single {-# UNPACK #-} !Char
            | Range  {-# UNPACK #-} !Char {-# UNPACK #-} !Char
+             deriving (Eq, Show)
+
+newtype CharRange = CR { unCR :: Range }
 
 -- | A rather hacked-up instance.
 --   This is to support fast lookups using 'Data.Set' (see 'toSet').
 --   x == y iff x and y overlap
-instance Eq Range where
-	(Single x) == (Single y) = x == y
-	(Single a) == (Range x y) = x <= a && a <= y
-	(Range x y) == (Single a) = x <= a && a <= y
-	(Range lx ux) == (Range ly uy) = (lx <= uy && ly <= ux)
+instance Eq CharRange where
+    CR (Single x)    == CR (Single y) = x == y
+    CR (Single a)    == CR (Range x y) = x <= a && a <= y
+    CR (Range x y)   == CR (Single a) = x <= a && a <= y
+    CR (Range lx ux) == CR (Range ly uy) = (lx <= uy && ly <= ux)
 
-instance Ord Range where
-	(Single x) <= (Single y) = x <= y
-	(Single x) <= (Range y _) = x <= y
-	(Range _ x) <= (Single y) = x <= y
-	(Range _ x) <= (Range y _) = x <= y
+instance Ord CharRange where
+    CR (Single x)  <= CR (Single y) = x <= y
+    CR (Single x)  <= CR (Range y _) = x <= y
+    CR (Range _ x) <= CR (Single y) = x <= y
+    CR (Range _ x) <= CR (Range y _) = x <= y
+
+newtype CharSet = CharSet (Set CharRange)
 
 -- | Allows quick lookups using ranges.
-toSet :: [Range] -> Set Range
-toSet = Set.fromDistinctAscList . prepareRanges
-  where prepareRanges :: [Range] -> [Range]
-        prepareRanges =  go . sort
+toSet :: [Range] -> CharSet
+toSet = CharSet . Set.fromDistinctAscList . prepareRanges
+  where prepareRanges :: [Range] -> [CharRange]
+        prepareRanges =  go . sort . map CR -- we could use unsafeCoerce to
+                                            -- avoid the cost of mapping
         go (r1:r2:rs) | Just r' <- maybeMergeRanges r1 r2 = go (r':rs)
                       | rss@(r3:rs') <- go (r2:rs) =
             case maybeMergeRanges r1 r3 of
@@ -35,9 +48,9 @@ toSet = Set.fromDistinctAscList . prepareRanges
                 Just r' -> r':rs'
         go rs = rs
 
-maybeMergeRanges :: Range -> Range -> Maybe Range
+maybeMergeRanges :: CharRange -> CharRange -> Maybe CharRange
 maybeMergeRanges x y = if x == y -- overlap
-                       then Just $ minMax x y
+                       then Just . CR $ minMax (unCR x) (unCR y)
                        else Nothing
 {-# INLINE maybeMergeRanges #-}
 
@@ -55,3 +68,6 @@ range x y = if x < y then Range x y
 single :: Char -> Range
 single = Single
 {-# INLINE single #-}
+
+member :: Char -> CharSet -> Bool
+member x (CharSet cs) = Set.member (CR $ Single x) cs

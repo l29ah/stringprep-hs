@@ -18,7 +18,7 @@ Library
               , text          >=0.9
  Exposed-modules: Text.StringPrep
                 , Text.StringPrep.Profiles
- Other-modules:   Text.CharRanges
+                , Text.CharRanges
  ghc-options: -O2 -Wall -fno-warn-name-shadowing
 
 test-suite tests
