@@ -17,8 +17,7 @@ Library
               , text-icu      >=0.6
               , text          >=0.9
  Exposed-modules: Text.StringPrep
-                , Text.NamePrep
-                , Text.SaslPrep
+                , Text.StringPrep.Profiles
  Other-modules:   Text.CharRanges
  ghc-options: -O2 -Wall -fno-warn-name-shadowing
 
