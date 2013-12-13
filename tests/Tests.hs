@@ -11,7 +11,7 @@ import           Test.Tasty.QuickCheck
 import           Test.Tasty.TH
 import qualified Text.CharRanges as CR
 import qualified Text.StringPrep as SP
-
+import           Unsafe.Coerce (unsafeCoerce)
 
 instance Arbitrary SP.Range where
     arbitrary = oneof [ CR.Single <$> arbitrary
@@ -24,8 +24,6 @@ instance Arbitrary SP.Range where
                       ]
     shrink (CR.Single _) = []
     shrink (CR.Range x y) = [CR.Single x, CR.Single y]
-
-deriving instance Show CR.Range
 
 newtype KnownRanges = KR  {unKR :: [CR.Range]} deriving (Show)
 newtype RandomRanges = RR {unRR :: [CR.Range]} deriving (Show)
@@ -52,7 +50,7 @@ eqRange (CR.Single x) (R.Single x') = x == x'
 eqRange _ _ = False
 
 rangeSetsEqual :: [SP.Range] -> Bool
-rangeSetsEqual rs = eqRanges (Set.toAscList $ CR.toSet rs)
+rangeSetsEqual rs = eqRanges (Set.toAscList . unsafeCoerce $ CR.toSet rs)
                              (Set.toAscList . R.toSet . R.ranges $ map toRange rs)
   where eqRanges [] [] = True
         eqRanges (x:xs) (y:ys) = eqRange x y && eqRanges xs ys
