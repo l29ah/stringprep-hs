@@ -40,27 +40,27 @@ runStringPrep (Profile maps norm prohibs bidi) s = result
 				else Just normed
 		result = case bidid of
 			Nothing -> Nothing
-			Just t -> if Text.any (\x -> Set.member (single x) prohibited) t
+			Just t -> if Text.any (\x -> member x prohibited) t
 				then Nothing
 				else Just t
 
 checkBidi :: Text -> Bool
 checkBidi t = not containsRandL || not containsAL && firstRandL && lastRandL
 	where
-		containsRandL = Text.any (\x -> Set.member (single x) randl) t
-		containsAL = Text.any (\x -> Set.member (single x) l) t
-		firstRandL = Set.member (single (Text.head t)) randl
-		lastRandL = Set.member (single (Text.last t)) randl
+		containsRandL = Text.any (\x -> member x randl) t
+		containsAL = Text.any (\x -> member  x l) t
+		firstRandL = member (Text.head t) randl
+		lastRandL = member (Text.last t) randl
 
 type Map = Char -> Text
 type Prohibited = [Range]
 
 b1 :: Map
-b1 c =
-	if c `Set.member` mapToNothings
-		then Text.empty
-		else Text.singleton c
+b1 c = if c `Set.member` mapToNothings
+       then Text.empty
+       else Text.singleton c
 
+mapToNothings :: Set.Set Char
 mapToNothings = Set.fromAscList ['\x00AD', '\x034F', '\x1806', '\x180B', '\x180C','\x180D', '\x200B', '\x200C', '\x200D', '\x2060', '\xFE00', '\xFE01', '\xFE02','\xFE03', '\xFE04', '\xFE05', '\xFE06', '\xFE07', '\xFE08', '\xFE09', '\xFE0A', '\xFE0B', '\xFE0C', '\xFE0D', '\xFE0E', '\xFE0F', '\xFEFF']
 
 b2 :: Map
@@ -134,7 +134,7 @@ c8 = [
 c9 :: [Range]
 c9 = [single '\xe0001', range '\xe0020' '\xe007f']
 
-randl :: Set.Set (Range)
+randl :: CharSet
 randl = toSet [
 	single '\x05BE',
 	single '\x05C0',
@@ -171,8 +171,9 @@ randl = toSet [
 	range '\xFE70' '\xFE74',
 	range '\xFE76' '\xFEFC']
 
-l :: Set.Set (Range)
-l = toSet [range '\x0041' '\x005A',
+l :: CharSet
+l = toSet [
+        range '\x0041' '\x005A',
 	range '\x0061' '\x007A',
 	single '\x00AA',
 	single '\x00B5',
