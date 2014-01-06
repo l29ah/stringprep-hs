@@ -11,6 +11,15 @@ License-file: LICENSE
 Category: data
 extra-source-files: Text/*.hs
 
+source-repository head
+    type: git
+    location: https://github.com/Porges/stringprep-hs.git
+
+source-repository this
+    type: git
+    location: https://github.com/Porges/stringprep-hs.git
+    tag: v1.0.0
+
 Library
  Build-Depends: base          >=3 &&    < 5
               , containers    >=0.2
