@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Text.StringPrep (
 StringPrepProfile(..),
 Range,
@@ -12,10 +13,25 @@ c11,c12,c21,c22,c3,c4,c5,c6,c7,c8,c9
 
 import Data.Text (Text)
 import qualified Data.Text as Text
+#ifndef __GHCJS
 import Data.Text.ICU.Normalize (NormalizationMode(NFKC),normalize)
+#endif
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 import Text.CharRanges
+#ifdef __GHCJS
+import GHCJS.Types (JSString)
+import Data.JSString.Text (textToJSString, textFromJSString)
+
+foreign import javascript unsafe
+    "$r=$1.normalize('NFKC')"
+    js_normalize :: JSString -> JSString
+
+data NormalizationMode = NFKC
+
+normalize :: NormalizationMode -> Text -> Text
+normalize _ = textFromJSString . js_normalize . textToJSString
+#endif
 
 data StringPrepProfile = Profile
 	{

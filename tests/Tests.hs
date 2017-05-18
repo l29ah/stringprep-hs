@@ -4,13 +4,16 @@ module Main where
 
 import           Control.Applicative
 import qualified Data.Set as Set
+import qualified Data.Text as T
 import qualified Ranges as R
 import           Test.QuickCheck
 import           Test.Tasty
 import           Test.Tasty.QuickCheck
 import           Test.Tasty.TH
+import           Test.Tasty.HUnit
 import qualified Text.CharRanges as CR
 import qualified Text.StringPrep as SP
+import qualified Text.StringPrep.Profiles as SPP
 import           Unsafe.Coerce (unsafeCoerce)
 
 instance Arbitrary SP.Range where
@@ -67,5 +70,12 @@ badRange :: [SP.Range]
 badRange = [CR.Single 'v', CR.Single '\234', CR.Range 'g' '\238']
 
 prop_badRangeToSetEqual = rangeSetsEqual badRange
+
+-- Exercise runStringPrep in the trivial case to make sure that the JavaScript
+-- FFI definition is correct.
+case_runStringPrep :: Assertion
+case_runStringPrep = assertEqual "" result expected
+  where expected = Just (T.pack "text")
+        result = SP.runStringPrep (SPP.namePrepProfile False) (T.pack "text")
 
 main = $(defaultMainGenerator)

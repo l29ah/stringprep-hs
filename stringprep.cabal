@@ -6,7 +6,7 @@ License: BSD3
 Author: George Pollard <porges@porg.es>
 Maintainer: George Pollard <porges@porg.es>
 Build-Type: Simple
-Cabal-Version: >=1.8
+Cabal-Version: >=1.10
 License-file: LICENSE
 Category: data
 extra-source-files: Text/*.hs
@@ -21,25 +21,36 @@ source-repository this
     tag: v1.0.0
 
 Library
- Build-Depends: base          >=3 &&    < 5
+ Build-Depends: base          >=3 && < 5
               , containers    >=0.2
-              , text-icu      >=0.6
               , text          >=0.9
+ if impl(ghcjs)
+    Build-Depends: ghcjs-base
+ else
+    Build-Depends: text-icu   >=0.6
  Exposed-modules: Text.StringPrep
                 , Text.StringPrep.Profiles
                 , Text.CharRanges
  ghc-options: -O2 -Wall -fno-warn-name-shadowing
+ default-language: Haskell2010
+ ghcjs-options: -D__GHCJS
 
 test-suite tests
  Build-Depends: base
               , QuickCheck
               , containers
               , text
-              , text-icu
               , tasty
               , tasty-quickcheck
               , tasty-th
+              , tasty-hunit
+ if impl(ghcjs)
+    Build-Depends: ghcjs-base
+ else
+    Build-Depends: text-icu
  type:         exitcode-stdio-1.0
  main-is:     Tests.hs
  Other-modules: Ranges
  hs-source-dirs: tests .
+ default-language: Haskell2010
+ ghcjs-options: -D__GHCJS
