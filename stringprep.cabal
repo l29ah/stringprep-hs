@@ -43,6 +43,7 @@ test-suite tests
               , tasty
               , tasty-quickcheck
               , tasty-th
+              , tasty-hunit
  if impl(ghcjs)
     Build-Depends: ghcjs-base
  else
